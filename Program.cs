@@ -1,28 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HelloWorld.Models;
 
 namespace HelloWorld
 {
-    public class Computer
-    {
-        public string Motherboard { get; set; } = "";
-        public int CPUCores { get; set; }
-        public bool HasWifi { get; set; }
-        public bool HasLTE { get; set; }
-        public DateTime ReleaseDate { get; set; }
-        public decimal Price { get; set; }
-        public string VideoCard { get; set; } = "";
 
-        // Constructor without null checks since default values are already set
-        public Computer() { }
-    }
 
     public class Program
     {
         public static void Main(string[] args)
         {
-            Computer myComputer = new Computer()
+            Computer myComputer = new()
             {
                 Motherboard = "Asus",
                 CPUCores = 8,
