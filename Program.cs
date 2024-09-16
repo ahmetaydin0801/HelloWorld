@@ -6,6 +6,8 @@ using Dapper;
 using HelloWorld.Data;
 using HelloWorld.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace HelloWorld
 {
@@ -13,10 +15,18 @@ namespace HelloWorld
 
     public class Program
     {
+
         public static void Main(string[] args)
         {
-            DataContextDapper dapper = new DataContextDapper();
-            DataContextEF ef = new DataContextEF();
+
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            string connectionString = config.GetConnectionString("DefaultConnection");
+
+            DataContextDapper dapper = new DataContextDapper(config);
+            DataContextEF ef = new DataContextEF(config);
 
             string sqlCommand = "SELECT GETDATE()";
 
