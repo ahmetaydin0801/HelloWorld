@@ -16,6 +16,7 @@ namespace HelloWorld
         public static void Main(string[] args)
         {
             DataContextDapper dapper = new DataContextDapper();
+            DataContextEF ef = new DataContextEF();
 
             string sqlCommand = "SELECT GETDATE()";
 
@@ -33,6 +34,9 @@ namespace HelloWorld
                 Price = 943.87m,
                 VideoCard = "Nvidia"
             };
+
+            ef.Add(myComputer);
+            ef.SaveChanges();
 
             string sql = @"INSERT INTO TutorialAppSchema.Computer (
                         Motherboard,
@@ -60,6 +64,7 @@ namespace HelloWorld
 
             string sqlSelect = @"
              SELECT
+                Computer.ComputerId,
                 Computer.Motherboard,
                 Computer.CPUCores,
                 Computer.HasWifi,
@@ -72,16 +77,36 @@ namespace HelloWorld
 
             IEnumerable<Computer> computers = dapper.LoadData<Computer>(sqlSelect);
 
-            Console.WriteLine("Computers in the database:");
-            foreach (Computer computer in computers)
-            {
-                Console.WriteLine($"Motherboard: {computer.Motherboard}");
-                Console.WriteLine($"CPU Cores: {computer.CPUCores}");
-                Console.WriteLine($"Has Wifi: {computer.HasWifi}");
-                Console.WriteLine($"Has LTE: {computer.HasLTE}");
-                Console.WriteLine($"Release Date: {computer.ReleaseDate}");
 
+            // Console.WriteLine("Computers in the database:");
+            // foreach (Computer computer in computers)
+            // {
+            //     Console.WriteLine($"Motherboard: {computer.Motherboard}");
+            //     Console.WriteLine($"CPU Cores: {computer.CPUCores}");
+            //     Console.WriteLine($"Has Wifi: {computer.HasWifi}");
+            //     Console.WriteLine($"Has LTE: {computer.HasLTE}");
+            //     Console.WriteLine($"Release Date: {computer.ReleaseDate}");
+
+            // }
+
+            IEnumerable<Computer>? computersEf = ef.Computer?.ToList<Computer>();
+
+            if (computersEf != null)
+            {
+                Console.WriteLine("Computers in the database:");
+                foreach (Computer computer in computersEf)
+                {
+                    Console.WriteLine($"ComputerId: {computer.ComputerId}");
+                    Console.WriteLine($"Motherboard: {computer.Motherboard}");
+                    Console.WriteLine($"CPU Cores: {computer.CPUCores}");
+                    Console.WriteLine($"Has Wifi: {computer.HasWifi}");
+                    Console.WriteLine($"Has LTE: {computer.HasLTE}");
+                    Console.WriteLine($"Release Date: {computer.ReleaseDate}");
+
+                }
             }
+
+
         }
     }
 }
