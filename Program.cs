@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.Json;
 using Dapper;
 using HelloWorld.Data;
 using HelloWorld.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace HelloWorld
 {
@@ -20,103 +23,88 @@ namespace HelloWorld
         {
 
             IConfiguration config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.json")
                 .Build();
 
-            string connectionString = config.GetConnectionString("DefaultConnection");
 
             DataContextDapper dapper = new DataContextDapper(config);
-            DataContextEF ef = new DataContextEF(config);
 
-            string sqlCommand = "SELECT GETDATE()";
 
-            DateTime rightNow = dapper.LoadDataSingle<DateTime>(sqlCommand);
+            // string sql = @"INSERT INTO TutorialAppSchema.Computer (
+            //             Motherboard,
+            //             CPUCores,
+            //             HasWifi, 
+            //             HasLTE,
+            //             ReleaseDate,
+            //             Price,
+            //             VideoCard
+            //         ) VALUES ('" + myComputer.Motherboard
+            //         + "','" + myComputer.CPUCores
+            //         + "','" + myComputer.HasWifi
+            //         + "','" + myComputer.HasLTE
+            //         + "','" + myComputer.ReleaseDate.ToString("yyyy-MM-dd HH:mm:ss")
+            //         + "','" + myComputer.Price
+            //         + "','" + myComputer.VideoCard
+            // + "')";
 
-            Console.WriteLine($"Th e current date and time is: {rightNow}");
+            string computersJson = File.ReadAllText("Computers.json");
 
-            Computer myComputer = new()
+            JsonSerializerOptions options = new JsonSerializerOptions
             {
-                Motherboard = "Asus",
-                CPUCores = 8,
-                HasWifi = true,
-                HasLTE = false,
-                ReleaseDate = DateTime.Now,
-                Price = 943.87m,
-                VideoCard = "Nvidia"
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             };
 
-            ef.Add(myComputer);
-            ef.SaveChanges();
 
-            string sql = @"INSERT INTO TutorialAppSchema.Computer (
+            IEnumerable<Computer> computersSystem = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Computer>>(computersJson, options);
+
+            IEnumerable<Computer> computersNewtonSoft = JsonConvert.DeserializeObject<IEnumerable<Computer>>(computersJson);
+
+            if (computersNewtonSoft != null)
+            {
+                foreach (Computer computer in computersNewtonSoft)
+                {
+                    string sql = @"INSERT INTO TutorialAppSchema.Computer (
                         Motherboard,
                         CPUCores,
-                        HasWifi,
+                        HasWifi, 
                         HasLTE,
                         ReleaseDate,
                         Price,
                         VideoCard
-                    ) VALUES ('" + myComputer.Motherboard
-                    + "','" + myComputer.CPUCores
-                    + "','" + myComputer.HasWifi
-                    + "','" + myComputer.HasLTE
-                    + "','" + myComputer.ReleaseDate.ToString("yyyy-MM-dd HH:mm:ss")
-                    + "','" + myComputer.Price
-                    + "','" + myComputer.VideoCard
-            + "')";
+                    ) VALUES ('" + computer.Motherboard
+                            + "','" + computer.CPUCores
+                            + "','" + computer.HasWifi
+                            + "','" + computer.HasLTE
+                            + "','" + computer.ReleaseDate?.ToString("yyyy-MM-dd HH:mm:ss")
+                            + "','" + computer.Price
+                            + "','" + EscapeSingleQuotes(computer.VideoCard)
+                    + "')";
 
-            Console.WriteLine(sql);
-
-            bool result = dapper.ExecuteSql(sql);
-
-            Console.WriteLine(result);
-
-
-            string sqlSelect = @"
-             SELECT
-                Computer.ComputerId,
-                Computer.Motherboard,
-                Computer.CPUCores,
-                Computer.HasWifi,
-                Computer.HasLTE,
-                Computer.ReleaseDate,
-                Computer.Price,
-                Computer.VideoCard
-             FROM TutorialAppSchema.Computer";
-
-
-            IEnumerable<Computer> computers = dapper.LoadData<Computer>(sqlSelect);
-
-
-            // Console.WriteLine("Computers in the database:");
-            // foreach (Computer computer in computers)
-            // {
-            //     Console.WriteLine($"Motherboard: {computer.Motherboard}");
-            //     Console.WriteLine($"CPU Cores: {computer.CPUCores}");
-            //     Console.WriteLine($"Has Wifi: {computer.HasWifi}");
-            //     Console.WriteLine($"Has LTE: {computer.HasLTE}");
-            //     Console.WriteLine($"Release Date: {computer.ReleaseDate}");
-
-            // }
-
-            IEnumerable<Computer>? computersEf = ef.Computer?.ToList<Computer>();
-
-            if (computersEf != null)
-            {
-                Console.WriteLine("Computers in the database:");
-                foreach (Computer computer in computersEf)
-                {
-                    Console.WriteLine($"ComputerId: {computer.ComputerId}");
-                    Console.WriteLine($"Motherboard: {computer.Motherboard}");
-                    Console.WriteLine($"CPU Cores: {computer.CPUCores}");
-                    Console.WriteLine($"Has Wifi: {computer.HasWifi}");
-                    Console.WriteLine($"Has LTE: {computer.HasLTE}");
-                    Console.WriteLine($"Release Date: {computer.ReleaseDate}");
-
+                    dapper.ExecuteSql(sql);
                 }
             }
 
 
+
+
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+
+            string computersCopy = JsonConvert.SerializeObject(computersNewtonSoft, settings);
+
+            File.WriteAllText("computersCopyNewtonsoft.txt", computersCopy);
+
+            string computersCopySystem = System.Text.Json.JsonSerializer.Serialize(computersSystem, options);
+
+            File.WriteAllText("computersCopySystem.txt", computersCopySystem);
+
+
+            static string EscapeSingleQuotes(string input)
+            {
+                return input.Replace("'", "''");
+            }
         }
     }
 }

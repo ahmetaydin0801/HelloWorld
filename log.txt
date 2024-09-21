@@ -1,0 +1,17 @@
+INSERT INTO TutorialAppSchema.Computer (
+                        Motherboard,
+                        CPUCores,
+                        HasWifi,
+                        HasLTE,
+                        ReleaseDate,
+                        Price,
+                        VideoCard
+                    ) VALUES ('Asus','8','True','False','2024-09-17 21:50:52','943.87','Nvidia')INSERT INTO TutorialAppSchema.Computer (
+                        Motherboard,
+                        CPUCores,
+                        HasWifi,
+                        HasLTE,
+                        ReleaseDate,
+                        Price,
+                        VideoCard
+                    ) VALUES ('Asus','8','True','False','2024-09-17 21:57:46','943.87','Nvidia')
