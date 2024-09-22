@@ -76,3 +76,4 @@
 /Users/ahmetaydin/dotnet-course-code/HelloWorld/bin/Debug/net8.0/appsettings.json
 /Users/ahmetaydin/dotnet-course-code/HelloWorld/obj/Debug/net8.0/HelloWorld.sourcelink.json
 /Users/ahmetaydin/dotnet-course-code/HelloWorld/bin/Debug/net8.0/Newtonsoft.Json.dll
+/Users/ahmetaydin/dotnet-course-code/HelloWorld/bin/Debug/net8.0/AutoMapper.dll
