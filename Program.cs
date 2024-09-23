@@ -72,19 +72,34 @@ namespace HelloWorld
 
             }));
 
-            IEnumerable<ComputerSnake>? computersSystem = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<ComputerSnake>>(computersJson);
+            IEnumerable<Computer> computersSystem = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Computer>>(computersJson);
+
 
             if (computersSystem != null)
             {
-                IEnumerable<Computer> computerResult = mapper.Map<IEnumerable<Computer>>(computersSystem);
 
-                foreach (Computer computer in computerResult)
+
+                foreach (Computer computer in computersSystem)
                 {
                     Console.WriteLine(computer.Motherboard);
                 }
-
-
             }
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+
+            // IEnumerable<ComputerSnake>? computersSystem = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<ComputerSnake>>(computersJson);
+
+            // if (computersSystem != null)
+            // {
+            //     IEnumerable<Computer> computerResult = mapper.Map<IEnumerable<Computer>>(computersSystem);
+
+            //     foreach (Computer computer in computerResult)
+            //     {
+            //         Console.WriteLine(computer.Motherboard);
+            //     }
+            // }
             // JsonSerializerOptions options = new JsonSerializerOptions
             // {
             //     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -92,7 +107,7 @@ namespace HelloWorld
 
 
 
-
+            // IEnumerable<Computer> computersSystem = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Computer>>(computersJson, options);
             // IEnumerable<Computer> computersNewtonSoft = JsonConvert.DeserializeObject<IEnumerable<Computer>>(computersJson);
 
             // if (computersNewtonSoft != null)
